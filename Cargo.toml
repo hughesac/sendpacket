@@ -1,6 +1,6 @@
 [package]
 name = "packet-builder"
-version = "0.5.0"
+version = "0.6.0"
 description = "High-level library for interacting with low-level network data."
 homepage = "https://github.com/hughesac/packet_builder"
 repository = "https://github.com/hughesac/packet_builder"
