@@ -14,7 +14,7 @@ macro_rules! arp {
       pkt.set_operation(pnet::packet::arp::ArpOperations::Request);
       pkt.set_hardware_type(pnet::packet::arp::ArpHardwareTypes::Ethernet);  
       pkt.set_protocol_type(pnet::packet::ethernet::EtherTypes::Ipv4); 
-      pkt.set_sender_hw_addr(pnet_base::MacAddr(1,2,3,4,5,6)); 
+      pkt.set_sender_hw_addr(pnet::util::MacAddr(1,2,3,4,5,6)); 
       $(
         pkt.$func($value);
       )*
@@ -42,7 +42,7 @@ mod tests {
       pkt_expected.set_operation(pnet::packet::arp::ArpOperations::Request);
       pkt_expected.set_hardware_type(pnet::packet::arp::ArpHardwareTypes::Ethernet);  
       pkt_expected.set_protocol_type(pnet::packet::ethernet::EtherTypes::Ipv4); 
-      pkt_expected.set_sender_hw_addr(pnet_base::MacAddr(1,2,3,4,5,6)); 
+      pkt_expected.set_sender_hw_addr(pnet::util::MacAddr(1,2,3,4,5,6));
       assert_eq!(pkt_expected.packet(), pkt.packet());
    }
 }

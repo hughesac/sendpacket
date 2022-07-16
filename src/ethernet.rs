@@ -35,12 +35,12 @@ mod tests {
    #[test]
    fn macro_ether_basic() {
       let mut buf = vec![0; 14];
-      let (pkt, proto) = ether!({set_destination =>  pnet_base::MacAddr(10,1,3,1,1,2), set_source => pnet_base::MacAddr(10,1,1,1,1,1)}, buf); 
+      let (pkt, proto) = ether!({set_destination =>  pnet::util::MacAddr(10,1,3,1,1,2), set_source => pnet::util::MacAddr(10,1,1,1,1,1)}, buf); 
       assert_eq!(proto, None);
       let buf_expected = vec![0; 14];
       let mut pkt_expected = pnet::packet::ethernet::MutableEthernetPacket::owned(buf_expected).unwrap();
-      pkt_expected.set_destination(pnet_base::MacAddr(10,1,3,1,1,2)); 
-      pkt_expected.set_source(pnet_base::MacAddr(10,1,1,1,1,1)); 
+      pkt_expected.set_destination(pnet::util::MacAddr(10,1,3,1,1,2)); 
+      pkt_expected.set_source(pnet::util::MacAddr(10,1,1,1,1,1)); 
       assert_eq!(pkt_expected.packet(), pkt.packet());
    }
 }

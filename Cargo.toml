@@ -16,8 +16,4 @@ categories = ["network-programming"]
 [dependencies]
 derive-new = "0.5"
 ipnetwork = "0.12.8"
-pnet = "0.26.0"
-pnet_datalink = "0.26.0"
-pnet_base = "0.26.0"
-pnet_macros_support = "0.26.0"
-
+pnet = "0.30.0"

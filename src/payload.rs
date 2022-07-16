@@ -13,7 +13,7 @@ pub struct PayloadData<'p> {
 
 // Implement the pnet Packet trait so we can use the same interface in the macro for getting the
 // data.
-impl <'p>pnet_macros_support::packet::Packet for PayloadData<'p> {
+impl <'p>pnet::packet::Packet for PayloadData<'p> {
     fn packet(& self) -> & [u8] { &self.data[..] }
     fn payload(& self) -> & [u8] { &self.data[..] }
 }
