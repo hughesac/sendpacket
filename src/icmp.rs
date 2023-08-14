@@ -1,7 +1,8 @@
-use pnet::packet::util::checksum as generic_checksum;
-use pnet::packet::Packet;
 use std::net::Ipv4Addr;
-use L4Checksum;
+
+use pnet::packet::{util::checksum as generic_checksum, Packet};
+
+use crate::L4Checksum;
 
 macro_rules! icmp_pkt_macro_generator {
   ($($name:ident => $icmp_type:ty), *) => {
@@ -9,11 +10,11 @@ macro_rules! icmp_pkt_macro_generator {
       #[macro_export]
       macro_rules! $name {
         ($args:tt, $payload_pkt:expr, $proto:expr, $buf:expr) => {{
-          icmp!($args, $payload_pkt, $icmp_type, $buf) 
+          icmp!($args, $payload_pkt, $icmp_type, $buf)
         }};
         ($args:tt, $buf:expr) => {{
-          icmp!($args, $icmp_type, $buf) 
-        }}; 
+          icmp!($args, $icmp_type, $buf)
+        }};
       }
     )*
   };
@@ -25,17 +26,19 @@ macro_rules! icmp_checksum_func_gen {
       impl <'p>L4Checksum for $icmp_type {
         fn checksum_ipv4(&mut self, _source: &Ipv4Addr, _destination: &Ipv4Addr) {
           // ICMP checksum is the same as IP
-          self.set_checksum(generic_checksum(&self.packet(), 1)); 
+          self.set_checksum(generic_checksum(&self.packet(), 1));
         }
       }
     )*
   };
 }
 
-icmp_checksum_func_gen!(pnet::packet::icmp::echo_reply::MutableEchoReplyPacket<'p>, 
-                        pnet::packet::icmp::echo_request::MutableEchoRequestPacket<'p>, 
-                        pnet::packet::icmp::destination_unreachable::MutableDestinationUnreachablePacket<'p>, 
-                        pnet::packet::icmp::time_exceeded::MutableTimeExceededPacket<'p>); 
+icmp_checksum_func_gen!(
+    pnet::packet::icmp::echo_reply::MutableEchoReplyPacket<'p>,
+    pnet::packet::icmp::echo_request::MutableEchoRequestPacket<'p>,
+    pnet::packet::icmp::destination_unreachable::MutableDestinationUnreachablePacket<'p>,
+    pnet::packet::icmp::time_exceeded::MutableTimeExceededPacket<'p>
+);
 
 icmp_pkt_macro_generator!(icmp_echo_req => pnet::packet::icmp::echo_request::MutableEchoRequestPacket,
                           icmp_echo_reply => pnet::packet::icmp::echo_reply::MutableEchoReplyPacket,
@@ -66,27 +69,23 @@ macro_rules! icmp {
    }};
 }
 
-
 #[cfg(test)]
 mod tests {
-   use pnet::packet::Packet;
-   use ::payload;
-   use payload::PayloadData;
-   use pnet::packet::icmp::{IcmpTypes};
-   use icmp;
+    use pnet::packet::{icmp::IcmpTypes, Packet};
 
-   #[test]
-   fn macro_icmp_basic() {
-      let mut buf = [0; 13];
-      let (pkt, proto) = icmp_dest_unreach!({set_icmp_type => IcmpTypes::DestinationUnreachable},
+    use crate::{icmp, payload, payload::PayloadData};
+
+    #[test]
+    fn macro_icmp_basic() {
+        let mut buf = [0; 13];
+        let (pkt, proto) = icmp_dest_unreach!({set_icmp_type => IcmpTypes::DestinationUnreachable},
         payload!({"hello".to_string().into_bytes()}, buf).0, None, buf);
-      assert_eq!(proto, pnet::packet::ip::IpNextHeaderProtocols::Icmp);
+        assert_eq!(proto, pnet::packet::ip::IpNextHeaderProtocols::Icmp);
 
-      let buf_expected = vec![0; 13];
-      let mut pkt_expected = pnet::packet::icmp::destination_unreachable::MutableDestinationUnreachablePacket::owned(buf_expected).unwrap();
-      pkt_expected.set_icmp_type(IcmpTypes::DestinationUnreachable);
-      pkt_expected.set_payload(&"hello".to_string().into_bytes()); 
-      assert_eq!(pkt_expected.packet(), pkt.packet());
-   }
+        let buf_expected = vec![0; 13];
+        let mut pkt_expected = pnet::packet::icmp::destination_unreachable::MutableDestinationUnreachablePacket::owned(buf_expected).unwrap();
+        pkt_expected.set_icmp_type(IcmpTypes::DestinationUnreachable);
+        pkt_expected.set_payload(&"hello".to_string().into_bytes());
+        assert_eq!(pkt_expected.packet(), pkt.packet());
+    }
 }
-

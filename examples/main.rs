@@ -21,9 +21,7 @@ fn main() {
 
     let interfaces = pnet_datalink::interfaces();
     let interface = interfaces
-        .into_iter()
-        .filter(|iface: &NetworkInterface| iface.name == if_name)
-        .next()
+        .into_iter().find(|iface: &NetworkInterface| iface.name == if_name)
         .unwrap_or_else(|| panic!("No such network interface: {}", if_name));
 
     let (mut sender, mut _receiver) = match pnet_datalink::channel(&interface, Default::default()) {
