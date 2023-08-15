@@ -53,7 +53,7 @@ macro_rules! tcp {
       $(
         match stringify!($func) {
           "set_options" => {
-            opts_len = extract_options_len!($func, $value);
+            opts_len = $crate::extract_options_len!($func, $value);
           }
           _ => (),
         }
@@ -79,7 +79,7 @@ macro_rules! tcp {
 mod tests {
     use pnet::packet::{tcp::TcpOption, Packet};
 
-    use crate::{payload, payload::PayloadData, tcp};
+    use crate::{payload, tcp};
 
     #[test]
     fn macro_tcp_basic() {

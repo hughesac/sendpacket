@@ -20,7 +20,7 @@ macro_rules! vlan {
 mod tests {
     use pnet::packet::Packet;
 
-    use crate::{payload, payload::PayloadData};
+    use crate::payload;
 
     #[test]
     fn macro_vlan_basic() {

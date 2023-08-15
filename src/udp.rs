@@ -31,7 +31,7 @@ macro_rules! udp {
 mod tests {
     use pnet::packet::Packet;
 
-    use crate::{payload, payload::PayloadData, udp};
+    use crate::{payload, udp};
 
     #[test]
     fn macro_udp_basic() {

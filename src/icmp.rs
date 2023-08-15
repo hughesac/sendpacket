@@ -4,20 +4,77 @@ use pnet::packet::{util::checksum as generic_checksum, Packet};
 
 use crate::L4Checksum;
 
-macro_rules! icmp_pkt_macro_generator {
-  ($($name:ident => $icmp_type:ty), *) => {
-    $(
-      #[macro_export]
-      macro_rules! $name {
-        ($args:tt, $payload_pkt:expr, $proto:expr, $buf:expr) => {{
-          icmp!($args, $payload_pkt, $icmp_type, $buf)
-        }};
-        ($args:tt, $buf:expr) => {{
-          icmp!($args, $icmp_type, $buf)
-        }};
-      }
-    )*
-  };
+#[macro_export]
+macro_rules! icmp_echo_req {
+    ($args:tt, $payload_pkt:expr, $proto:expr, $buf:expr) => {{
+        $crate::icmp!(
+            $args,
+            $payload_pkt,
+            pnet::packet::icmp::echo_request::MutableEchoRequestPacket,
+            $buf
+        )
+    }};
+    ($args:tt, $buf:expr) => {{
+        $crate::icmp!(
+            $args,
+            pnet::packet::icmp::echo_request::MutableEchoRequestPacket,
+            $buf
+        )
+    }};
+}
+#[macro_export]
+macro_rules! icmp_echo_reply {
+    ($args:tt, $payload_pkt:expr, $proto:expr, $buf:expr) => {{
+        $crate::icmp!(
+            $args,
+            $payload_pkt,
+            pnet::packet::icmp::echo_reply::MutableEchoReplyPacket,
+            $buf
+        )
+    }};
+    ($args:tt, $buf:expr) => {{
+        $crate::icmp!(
+            $args,
+            pnet::packet::icmp::echo_reply::MutableEchoReplyPacket,
+            $buf
+        )
+    }};
+}
+#[macro_export]
+macro_rules! icmp_dest_unreach {
+    ($args:tt, $payload_pkt:expr, $proto:expr, $buf:expr) => {{
+        $crate::icmp!(
+            $args,
+            $payload_pkt,
+            pnet::packet::icmp::destination_unreachable::MutableDestinationUnreachablePacket,
+            $buf
+        )
+    }};
+    ($args:tt, $buf:expr) => {{
+        $crate::icmp!(
+            $args,
+            pnet::packet::icmp::destination_unreachable::MutableDestinationUnreachablePacket,
+            $buf
+        )
+    }};
+}
+#[macro_export]
+macro_rules! icmp_time_exceed {
+    ($args:tt, $payload_pkt:expr, $proto:expr, $buf:expr) => {{
+        $crate::icmp!(
+            $args,
+            $payload_pkt,
+            pnet::packet::icmp::time_exceeded::MutableTimeExceededPacket,
+            $buf
+        )
+    }};
+    ($args:tt, $buf:expr) => {{
+        $crate::icmp!(
+            $args,
+            pnet::packet::icmp::time_exceeded::MutableTimeExceededPacket,
+            $buf
+        )
+    }};
 }
 
 macro_rules! icmp_checksum_func_gen {
@@ -40,11 +97,6 @@ icmp_checksum_func_gen!(
     pnet::packet::icmp::time_exceeded::MutableTimeExceededPacket<'p>
 );
 
-icmp_pkt_macro_generator!(icmp_echo_req => pnet::packet::icmp::echo_request::MutableEchoRequestPacket,
-                          icmp_echo_reply => pnet::packet::icmp::echo_reply::MutableEchoReplyPacket,
-                          icmp_dest_unreach => pnet::packet::icmp::destination_unreachable::MutableDestinationUnreachablePacket,
-                          icmp_time_exceed => pnet::packet::icmp::time_exceeded::MutableTimeExceededPacket);
-
 #[macro_export]
 macro_rules! icmp {
    ({$($func:ident => $value:expr), *}, $icmp_type:ty, $buf:expr) => {{
@@ -61,7 +113,7 @@ macro_rules! icmp {
       let total_len = <$icmp_type>::minimum_packet_size() + $payload_pkt.packet().len();
       let buf_len = $buf.len();
       let mut pkt = <$icmp_type>::new(&mut $buf[buf_len - total_len..]).unwrap();
-      pkt.set_icmp_type(IcmpTypes::EchoRequest);
+      pkt.set_icmp_type(pnet::packet::icmp::IcmpTypes::EchoRequest);
       $(
         pkt.$func($value);
       )*
@@ -73,7 +125,7 @@ macro_rules! icmp {
 mod tests {
     use pnet::packet::{icmp::IcmpTypes, Packet};
 
-    use crate::{icmp, payload, payload::PayloadData};
+    use crate::payload;
 
     #[test]
     fn macro_icmp_basic() {

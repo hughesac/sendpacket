@@ -36,7 +36,6 @@ macro_rules! extract_address {
 #[macro_export]
 macro_rules! ipv4 {
     ({$($func:ident => $value:expr), *}, $l4_pkt:expr, $protocol:expr, $buf:expr) => {{
-
         let total_len = $crate::ipv4::IPV4_HEADER_LEN + $l4_pkt.packet().len();
         let mut source = $crate::ipv4::DEFAULT_SOURCE;
         let mut dest = $crate::ipv4::DEFAULT_DESTINATION;
@@ -49,13 +48,13 @@ macro_rules! ipv4 {
         // can all match which will cause type errors.  The extract_address macro avoids this
         // problem.
         match stringify!($func) {
-            "set_source" => source = extract_address!($func, $value),
-            "set_destination" => dest = extract_address!($func, $value),
+            "set_source" => source = $crate::extract_address!($func, $value),
+            "set_destination" => dest = $crate::extract_address!($func, $value),
             _ => (),
         }
         )*
 
-        $l4_pkt.checksum_ipv4(&source, &dest);
+        $crate::L4Checksum::checksum_ipv4(&mut $l4_pkt, &source, &dest);
         let buf_len = $buf.len();
         let mut pkt = pnet::packet::ipv4::MutableIpv4Packet::new(&mut $buf[buf_len - total_len..]).unwrap();
         pkt.set_next_level_protocol($protocol);
@@ -78,11 +77,9 @@ macro_rules! ipv4addr {
 
 #[cfg(test)]
 mod tests {
-    use ipv4;
-    use payload::PayloadData;
     use pnet::packet::{ethernet::EtherTypes::Ipv4, Packet};
 
-    use crate::{payload, L4Checksum};
+    use crate::payload;
 
     #[test]
     fn macro_ipv4_basic() {

@@ -27,7 +27,7 @@ impl<'p> pnet::packet::Packet for PayloadData<'p> {
 macro_rules! payload {
     ($value:expr, $buf:expr) => {{
         let buf_len = $buf.len();
-        let pdata = PayloadData { data: &mut$buf[buf_len - $value.len()..] };
+        let pdata = $crate::payload::PayloadData { data: &mut$buf[buf_len - $value.len()..] };
         for i in 0..$value.len() {
             pdata.data[i] = $value[i];
         }
