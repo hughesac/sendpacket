@@ -84,7 +84,7 @@ mod tests {
     #[test]
     fn macro_tcp_basic() {
         let mut buf = [0; 33];
-        let (pkt, proto) = tcp!({set_source => 53, set_destination => 5353, set_options => &vec!(TcpOption::mss(1200), TcpOption::wscale(2))},
+        let (pkt, proto) = tcp!({set_source => 53, set_destination => 5353, set_options => &[TcpOption::mss(1200), TcpOption::wscale(2)]},
         payload!({"hello".to_string().into_bytes()}, buf).0, None, buf);
         assert_eq!(proto, pnet::packet::ip::IpNextHeaderProtocols::Tcp);
 
@@ -94,7 +94,7 @@ mod tests {
         pkt_expected.set_source(53);
         pkt_expected.set_data_offset(7);
         pkt_expected.set_payload(&"hello".to_string().into_bytes());
-        pkt_expected.set_options(&vec![TcpOption::mss(1200), TcpOption::wscale(2)]);
+        pkt_expected.set_options(&[TcpOption::mss(1200), TcpOption::wscale(2)]);
         pkt_expected.set_flags(pnet::packet::tcp::TcpFlags::SYN);
         pkt_expected.set_sequence(0);
         pkt_expected.set_acknowledgement(0);

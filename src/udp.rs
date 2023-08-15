@@ -44,7 +44,7 @@ mod tests {
         let mut pkt_expected = pnet::packet::udp::MutableUdpPacket::owned(buf_expected).unwrap();
         pkt_expected.set_destination(5353);
         pkt_expected.set_source(53);
-        pkt_expected.set_length(13 as u16);
+        pkt_expected.set_length(13);
         pkt_expected.set_payload(&"hello".to_string().into_bytes());
         assert_eq!(pkt_expected.packet(), pkt.packet());
     }
