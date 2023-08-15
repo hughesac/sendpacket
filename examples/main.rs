@@ -1,16 +1,15 @@
 extern crate packet_builder;
-extern crate pnet_datalink;
 extern crate pnet;
+extern crate pnet_datalink;
 
-use packet_builder::payload::PayloadData;
 use packet_builder::*;
-use pnet_datalink::Channel::Ethernet;
-use pnet_datalink::NetworkInterface;
 use pnet::packet::icmp::IcmpTypes;
 use pnet::packet::tcp::TcpFlags;
 use pnet::packet::tcp::TcpOption;
 use pnet::packet::Packet;
 use pnet::util::MacAddr;
+use pnet_datalink::Channel::Ethernet;
+use pnet_datalink::NetworkInterface;
 use std::env;
 
 fn main() {
@@ -22,8 +21,7 @@ fn main() {
     let interfaces = pnet_datalink::interfaces();
     let interface = interfaces
         .into_iter()
-        .filter(|iface: &NetworkInterface| iface.name == if_name)
-        .next()
+        .find(|iface: &NetworkInterface| iface.name == if_name)
         .unwrap_or_else(|| panic!("No such network interface: {}", if_name));
 
     let (mut sender, mut _receiver) = match pnet_datalink::channel(&interface, Default::default()) {
